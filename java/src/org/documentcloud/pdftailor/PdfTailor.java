@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Iterator;
+import java.lang.reflect.Field;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -87,6 +88,13 @@ public class PdfTailor {
     while (pdfPaths.hasNext()) {
       String path = pdfPaths.next();
       reader = new PdfReader(path);
+
+      try {
+        Field f = reader.getClass().getDeclaredField("encrypted");
+        f.setAccessible(true);
+        f.set(reader, false);
+      } catch (Exception e) {}
+
       for ( int pageNumber = 0; pageNumber < reader.getNumberOfPages(); ) {
         writer.addPage(writer.getImportedPage( reader, ++pageNumber ));
       }
